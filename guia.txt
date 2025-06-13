@@ -1,0 +1,189 @@
+1) Instalacion y dependencias basicas
+    npm create vite@latest .
+    npm install
+
+    npm install react-router-dom
+    npm install bootstrap@5.3.3
+    npm install react-icons
+
+2) configurar bootstrap 
+    modo 1) 
+        en index.html agregar estas lineas 
+        despues del </title> 
+            <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+        andes del </body>
+            <script type="module" src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+
+    modo 2)
+        en main.jsx agregar estas lineas antes de import './index.css'
+        import 'bootstrap/dist/css/bootstrap.min.css';
+        import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
+3) limpiar y configurar el tema
+    limpiar app.css, index.css 
+    limpiar el archivo app.jsx y aplicar el rafce 
+    agregar las clases text-center py-4 y verificar si tenemos todo bien
+    agregar el tema oscuro en el index.html <body data-bs-theme="dark">
+
+4) crear la estructura base 
+    1) crear las carpetas pages y components dentro de src
+    2) crear los componentes Header.jsx, Footer.jsx y "aplicar el rafce"
+    3) crear las paginas dentro de src/pages por ejemplo:
+         Inicio.jsx, Movil.jsx, Laptop.jsx, Tienda.jsx y Categorias.jsx
+         aplicar el rafce a todas
+
+5) Crear el sistema de rutas
+    1) Inportar el Navbar de bootstrap en el Header.jsx y aplicar la conversion a jsx por medio html to jsx
+    2) configurar el menu segun las pagina creadas anteriormente
+    3) cambiar el <a por el <Link to {'/inicio'} y asi con todos que es parte del manejo de rutas de react-router-dom
+    4) en al App.jsx crear el sistema de ruteo
+
+    import React from 'react'
+    import { BrowserRouter, Route, Routes } from 'react-router-dom'
+    import Header from './components/Header'
+    import Footer from './components/Footer'
+    import Inicio from './pages/Inicio'
+    import Error405 from './pages/Error405'
+    import Movil from './pages/Movil'
+    import Laptop from './pages/Laptop'
+    import Tienda from './pages/Tienda'
+
+    const App = () => {
+    return (
+        <BrowserRouter>
+        <div className="app">
+            <Header/>
+            <Routes>
+                <Route path="/" element={<Inicio />} />
+                <Route path="/inicio" element={<Inicio />} />
+                <Route path="/movil" element={<Movil />} />
+                <Route path="/laptop" element={<Laptop />} />
+                <Route path="/tienda" element={<Tienda />} />
+                <Route path="*" element={<Error405 />} />
+            </Routes>
+            <Footer/>
+        </div>
+        </BrowserRouter>
+    )
+    }
+
+    export default App
+
+6) crear un componente dinamico que se alimente de un json en este caso de dummyjson
+
+
+//***********************************************************************
+// zona de importacion 
+//***********************************************************************
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+const API = 'https://dummyjson.com/products/category/smartphones';
+
+const Movil = () => {
+    //***********************************************************************
+    // zona de la logica
+    //***********************************************************************
+    const [datos, setDatos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const getDatos = async () => {
+        try {
+            const response = await fetch(API);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            setDatos(data.products);
+            setLoading(false);
+        } catch (err) {
+            setError(err.message);
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        getDatos();
+    }, []);
+    if (loading) {
+        return (
+            <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+                <p>Cargando Personajes...</p>
+            </div>
+        );
+    }
+    if (error) {
+        return (
+            <div className="text-center py-5 text-danger">
+                <h4>Error al cargar los Personajes</h4>
+                <p>{error}</p>
+            </div>
+        );
+    }
+    //***********************************************************************
+    // zona de renderizado
+    //***********************************************************************
+    return (
+        <div className="container">
+            <h4 className="text-center py-4">Moviles</h4>
+            <div className="row">
+                {datos.map((item) => (
+                    <div className="col-md-4 col-xl-3 mb-3" key={item.id}>
+                        <div className="card h-100">
+                            <div className="card-header p-0">
+                                <img src={item.thumbnail} alt="" className="img-fluid" />
+                            </div>
+                            <div className="card-body text-center">
+                                <p className="fs-3">{item.title}</p>
+                                <p className="fs-5 text-danger fw-bold">Precio: {item.price}$</p>
+                            </div>
+                            <div className="card-footer text-center">
+                                <a href="#" className="btn btn-primary btn-sm me-3" data-bs-toggle="modal" data-bs-target={`#${item.id}`}>Modal</a>
+                                <Link to={`/detalle/${item.id}/${item.title}`} href="#" className="btn btn-info btn-sm" >Detalle</Link>
+                            </div>
+                        </div>
+
+                        <div className="modal fade" id={item.id} tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div className="modal-dialog modal-xl" >
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h1 className="modal-title fs-5" id="exampleModalLabel">{item.title}</h1>
+                                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+                                    </div>
+                                    <div className="modal-body">
+                                        <div className="row">
+                                            <div className="col-md-4">
+                                                <img src={item.thumbnail} alt="" className="img-fluid" />
+                                            </div>
+                                            <div className="col-md-8">
+                                                <p className="fs-3">{item.title}</p>
+                                                <p className="fs-3">Categoria: {item.category}</p>
+                                                <p className="fs-3">Marca: {item.brand}</p>
+                                                <p className="fs-3">Existencia: {item.stock}</p>
+                                                <p className="fs-6">{item.description}</p>
+                                                <p className="fs-5 text-danger fw-bold">Precio: {item.price}$</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                ))}
+
+            </div>
+        </div>
+
+
+    )
+}
+
+export default Movil
