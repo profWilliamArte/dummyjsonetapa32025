@@ -29,10 +29,10 @@ const formatCurrency = (value) => {
 
     return ` ${formattedNumber}`;
 };
-    const { loading, error, dolar, euro, fecha } = useContext(DolarContext);
+    //const { loading, error, dolar, euro, fecha } = useContext(DolarContext);
 
-    if (loading) return <p>Cargando precio del dólar...</p>;
-    if (error) return <p className="text-danger">Error al cargar el dólar: {error}</p>;
+   // if (loading) return <p>Cargando precio del dólar...</p>;
+   // if (error) return <p className="text-danger">Error al cargar el dólar: {error}</p>;
     return (
         <div className="col-md-4 col-xl-3 mb-3" >
             <div className="card h-100">
@@ -47,8 +47,7 @@ const formatCurrency = (value) => {
                 </div>
                 <div className="card-body text-center">
                     <p className="fs-3">{item.title}</p>
-                    <p className="fs-5 text-danger fw-bold">Precio: {formatCurrency(item.price)}$<br/>
-                    <span className="text-info small">{formatCurrency(item.price*dolar)}Bs</span></p>
+                    <p className="fs-5 text-danger fw-bold">Precio: {formatCurrency(item.price)}$</p>
                     {totalProd > 0 && (
                         <p className="mt-2 fs-6 text-warning">
                             Total: {formatCurrency(precioTotal)}
